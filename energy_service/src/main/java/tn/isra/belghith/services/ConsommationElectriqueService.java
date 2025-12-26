@@ -3,6 +3,7 @@ package tn.isra.belghith.services;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import tn.isra.belghith.DTO.ConsommationElectriqueDTO;
+import tn.isra.belghith.DTO.PompeDTO;
 import tn.isra.belghith.entities.ConsommationElectrique;
 import tn.isra.belghith.entities.Pompe;
 import tn.isra.belghith.events.SurconsommationEvent;
@@ -40,10 +41,13 @@ public class ConsommationElectriqueService {
     public ConsommationElectriqueDTO enregistrerConsommation(ConsommationElectrique consommationElec) {
         log.info("Enregistrement consommation pour pompe: {}", consommationElec.getPompe().getId());
 
-        // Vérifier que la pompe existe
+        // Vérifier que la pompe existe et la récupérer complètement
         Pompe pompe = pompeRepository.findById(consommationElec.getPompe().getId())
                 .orElseThrow(
                         () -> new RuntimeException("Pompe not found with id: " + consommationElec.getPompe().getId()));
+
+        // Attacher la pompe complète à la consommation
+        consommationElec.setPompe(pompe);
 
         ConsommationElectrique savedConsommation = consommationRepository.save(consommationElec);
 
@@ -91,9 +95,20 @@ public class ConsommationElectriqueService {
     }
 
     private ConsommationElectriqueDTO convertToDTO(ConsommationElectrique consommation) {
+        PompeDTO pompeDTO = null;
+        if (consommation.getPompe() != null) {
+            Pompe pompe = consommation.getPompe();
+            pompeDTO = new PompeDTO(
+                    pompe.getId(),
+                    pompe.getReference(),
+                    pompe.getPuissance(),
+                    pompe.getStatut(),
+                    pompe.getDateMiseEnService());
+        }
+
         return new ConsommationElectriqueDTO(
                 consommation.getId(),
-                consommation.getPompe(),
+                pompeDTO,
                 consommation.getEnergieUtilisee(),
                 consommation.getDuree(),
                 consommation.getDateMesure());
@@ -102,7 +117,14 @@ public class ConsommationElectriqueService {
     private ConsommationElectrique convertToEntity(ConsommationElectriqueDTO dto) {
         ConsommationElectrique consommation = new ConsommationElectrique();
         consommation.setId(dto.getId());
-        consommation.setPompe(dto.getPompe());
+
+        // Récupérer la pompe depuis la base de données
+        if (dto.getPompe() != null && dto.getPompe().getId() != null) {
+            Pompe pompe = pompeRepository.findById(dto.getPompe().getId())
+                    .orElseThrow(() -> new RuntimeException("Pompe not found with id: " + dto.getPompe().getId()));
+            consommation.setPompe(pompe);
+        }
+
         consommation.setEnergieUtilisee(dto.getEnergieUtilisee());
         consommation.setDuree(dto.getDuree());
         consommation.setDateMesure(dto.getDateMesure());
