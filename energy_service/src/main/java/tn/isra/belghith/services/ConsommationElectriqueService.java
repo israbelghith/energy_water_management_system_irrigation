@@ -57,6 +57,13 @@ public class ConsommationElectriqueService {
         return convertToDTO(savedConsommation);
     }
 
+    public List<ConsommationElectriqueDTO> getAllConsommations() {
+        log.info("Récupération de toutes les consommations");
+        return consommationRepository.findAll().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
     public List<ConsommationElectriqueDTO> getConsommationsByPompe(Long pompeId) {
         return consommationRepository.findByPompeId(pompeId).stream()
                 .map(this::convertToDTO)
@@ -74,6 +81,40 @@ public class ConsommationElectriqueService {
     public Double getConsommationTotale(Long pompeId, Date debut, Date fin) {
         Double total = consommationRepository.sumEnergieByPompeIdAndPeriod(pompeId, debut, fin);
         return total != null ? total : 0.0;
+    }
+
+    public Double getConsommationTotaleGlobale() {
+        log.info("Calcul de la consommation totale globale");
+        List<ConsommationElectrique> allConsommations = consommationRepository.findAll();
+        return allConsommations.stream()
+                .mapToDouble(ConsommationElectrique::getEnergieUtilisee)
+                .sum();
+    }
+
+    public ConsommationElectriqueDTO enregistrerConsommationFromDTO(ConsommationElectriqueDTO dto) {
+        // Récupérer le pompeId de manière sécurisée
+        Long pompeId = null;
+        if (dto.getPompe() != null && dto.getPompe().getId() != null) {
+            pompeId = dto.getPompe().getId();
+        } else if (dto.getPompeId() != null) {
+            pompeId = dto.getPompeId();
+        }
+
+        log.info("Enregistrement consommation depuis DTO pour pompe: {}", pompeId);
+
+        // Convertir DTO en entité
+        ConsommationElectrique consommation = convertToEntity(dto);
+
+        // Enregistrer
+        return enregistrerConsommation(consommation);
+    }
+
+    public List<ConsommationElectriqueDTO> getSurconsommations(Double seuil) {
+        log.info("Recherche des surconsommations au-dessus de {} kWh", seuil);
+        return consommationRepository.findAll().stream()
+                .filter(c -> c.getEnergieUtilisee() > seuil)
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
     private void verifierSurconsommation(ConsommationElectrique consommation, Pompe pompe) {
@@ -109,6 +150,7 @@ public class ConsommationElectriqueService {
         return new ConsommationElectriqueDTO(
                 consommation.getId(),
                 pompeDTO,
+                null, // pompeId - not needed when we have the full pompe object
                 consommation.getEnergieUtilisee(),
                 consommation.getDuree(),
                 consommation.getDateMesure());
@@ -119,9 +161,18 @@ public class ConsommationElectriqueService {
         consommation.setId(dto.getId());
 
         // Récupérer la pompe depuis la base de données
+        final Long pompeId;
         if (dto.getPompe() != null && dto.getPompe().getId() != null) {
-            Pompe pompe = pompeRepository.findById(dto.getPompe().getId())
-                    .orElseThrow(() -> new RuntimeException("Pompe not found with id: " + dto.getPompe().getId()));
+            pompeId = dto.getPompe().getId();
+        } else if (dto.getPompeId() != null) {
+            pompeId = dto.getPompeId();
+        } else {
+            pompeId = null;
+        }
+
+        if (pompeId != null) {
+            Pompe pompe = pompeRepository.findById(pompeId)
+                    .orElseThrow(() -> new RuntimeException("Pompe not found with id: " + pompeId));
             consommation.setPompe(pompe);
         }
 

@@ -37,6 +37,30 @@ public class PompeService {
         log.info("Pompe créée avec succès - ID: {}", savedPompe.getId());
         return convertToDTO(savedPompe);
     }
+
+    public PompeDTO createPompeFromDTO(PompeDTO pompeDTO) {
+        log.info("Création nouvelle pompe avec référence: {}", pompeDTO.getReference());
+        
+        // Vérification métier: référence unique
+        if (pompeRepository.findByReference(pompeDTO.getReference()) != null) {
+            throw new RuntimeException("Une pompe avec cette référence existe déjà: " + pompeDTO.getReference());
+        }
+        
+        // Validation métier: puissance > 0
+        if (pompeDTO.getPuissance() == null || pompeDTO.getPuissance() <= 0) {
+            throw new RuntimeException("La puissance doit être supérieure à 0");
+        }
+        
+        Pompe pompe = new Pompe();
+        pompe.setReference(pompeDTO.getReference());
+        pompe.setPuissance(pompeDTO.getPuissance());
+        pompe.setStatut(pompeDTO.getStatut());
+        pompe.setDateMiseEnService(pompeDTO.getDateMiseEnService());
+        
+        Pompe savedPompe = pompeRepository.save(pompe);
+        log.info("Pompe créée avec succès - ID: {}", savedPompe.getId());
+        return convertToDTO(savedPompe);
+    }
     
     public PompeDTO updatePompe(Long id, Pompe pompe) {
         log.info("Mise à jour pompe id: {}", id);
@@ -59,6 +83,33 @@ public class PompeService {
         pompeExist.setPuissance(pompe.getPuissance());
         pompeExist.setStatut(pompe.getStatut());
         pompeExist.setDateMiseEnService(pompe.getDateMiseEnService());
+        
+        Pompe updatedPompe = pompeRepository.save(pompeExist);
+        log.info("Pompe mise à jour avec succès - ID: {}", updatedPompe.getId());
+        return convertToDTO(updatedPompe);
+    }
+
+    public PompeDTO updatePompeFromDTO(Long id, PompeDTO pompeDTO) {
+        log.info("Mise à jour pompe id: {}", id);
+        
+        Pompe pompeExist = pompeRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Pompe non trouvée avec id: " + id));
+        
+        // Validation métier: vérifier que la référence n'est pas déjà utilisée par une autre pompe
+        Pompe pompeAvecMemeRef = pompeRepository.findByReference(pompeDTO.getReference());
+        if (pompeAvecMemeRef != null && !pompeAvecMemeRef.getId().equals(id)) {
+            throw new RuntimeException("Cette référence est déjà utilisée par une autre pompe");
+        }
+        
+        // Validation métier: puissance
+        if (pompeDTO.getPuissance() == null || pompeDTO.getPuissance() <= 0) {
+            throw new RuntimeException("La puissance doit être supérieure à 0");
+        }
+        
+        pompeExist.setReference(pompeDTO.getReference());
+        pompeExist.setPuissance(pompeDTO.getPuissance());
+        pompeExist.setStatut(pompeDTO.getStatut());
+        pompeExist.setDateMiseEnService(pompeDTO.getDateMiseEnService());
         
         Pompe updatedPompe = pompeRepository.save(pompeExist);
         log.info("Pompe mise à jour avec succès - ID: {}", updatedPompe.getId());

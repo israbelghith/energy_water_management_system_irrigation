@@ -5,13 +5,15 @@ import java.util.Date;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import tn.isra.belghith.entities.StatutPompe;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class PompeDTO {
-	
-	private Long id;
+
+    private Long id;
     private String reference;
     private Double puissance;
     private StatutPompe statut;

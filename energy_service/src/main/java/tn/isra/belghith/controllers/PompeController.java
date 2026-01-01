@@ -26,16 +26,15 @@ public class PompeController {
     private PompeService pompeService;
 
     @PostMapping
-    public ResponseEntity<PompeDTO> createPompe(@RequestBody Pompe pompe) {
-        log.info("Requête de création de pompe: {}", pompe.getReference());
-        return new ResponseEntity<>(pompeService.createPompe(pompe), HttpStatus.CREATED);
+    public ResponseEntity<PompeDTO> createPompe(@RequestBody PompeDTO pompeDTO) {
+        log.info("Requête de création de pompe: {}", pompeDTO.getReference());
+        return new ResponseEntity<>(pompeService.createPompeFromDTO(pompeDTO), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PompeDTO> updatePompe(@PathVariable Long id, @RequestBody Pompe pompe) {
+    public ResponseEntity<PompeDTO> updatePompe(@PathVariable Long id, @RequestBody PompeDTO pompeDTO) {
         log.info("Requête de mise à jour de pompe id: {}", id);
-
-        return ResponseEntity.ok(pompeService.updatePompe(id, pompe));
+        return ResponseEntity.ok(pompeService.updatePompeFromDTO(id, pompeDTO));
     }
 
     @GetMapping("/{id}")
@@ -85,6 +84,20 @@ public class PompeController {
         log.info("Changement de statut pour pompe id: {} vers {}", id, nouveauStatut);
         PompeDTO pompe = pompeService.changerStatut(id, nouveauStatut);
         return ResponseEntity.ok(pompe);
+    }
+
+    @PutMapping("/{id}/activer")
+    public ResponseEntity<Void> activerPompe(@PathVariable Long id) {
+        log.info("Activation de la pompe id: {}", id);
+        pompeService.changerStatut(id, StatutPompe.ACTIVE);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/desactiver")
+    public ResponseEntity<Void> desactiverPompe(@PathVariable Long id) {
+        log.info("Désactivation de la pompe id: {}", id);
+        pompeService.changerStatut(id, StatutPompe.INACTIVE);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
