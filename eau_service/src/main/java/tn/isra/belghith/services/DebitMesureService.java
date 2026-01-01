@@ -51,6 +51,13 @@ public class DebitMesureService {
         return convertToDto(saved);
     }
 
+    public List<DebitMesureDto> getAllDebitMesures() {
+        log.info("Récupération de toutes les mesures de débit");
+        return debitMesureRepository.findAll().stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
     public DebitMesureDto getDebitMesure(Long id) {
         DebitMesure debitMesure = debitMesureRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Mesure de débit non trouvée avec l'ID: " + id));
@@ -113,6 +120,17 @@ public class DebitMesureService {
     public void deleteDebitMesure(Long id) {
         log.info("Suppression de la mesure de débit ID: {}", id);
         debitMesureRepository.deleteById(id);
+    }
+
+    public boolean verifierDisponibiliteElectrique(Long pompeId) {
+        log.info("Vérification de la disponibilité électrique pour la pompe ID: {}", pompeId);
+        try {
+            Boolean disponible = energyServiceClient.verifierDisponibiliteElectrique(pompeId);
+            return disponible != null && disponible;
+        } catch (Exception e) {
+            log.error("Erreur lors de la vérification de la disponibilité électrique: {}", e.getMessage());
+            return false;
+        }
     }
 
     private DebitMesureDto convertToDto(DebitMesure debitMesure) {

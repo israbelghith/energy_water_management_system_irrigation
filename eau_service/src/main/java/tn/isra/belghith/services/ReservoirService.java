@@ -62,6 +62,45 @@ public class ReservoirService {
         return convertToDto(updated);
     }
 
+    public ReservoirDto updateReservoir(Long id, ReservoirDto dto) {
+        log.info("Mise à jour complète du réservoir ID: {} avec DTO: {}", id, dto);
+
+        Reservoir reservoir = reservoirRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Réservoir non trouvé avec l'ID: " + id));
+
+        // Mise à jour des champs
+        if (dto.getNom() != null) {
+            reservoir.setNom(dto.getNom());
+        }
+        if (dto.getCapaciteTotale() != null) {
+            reservoir.setCapaciteTotale(dto.getCapaciteTotale());
+        }
+        if (dto.getVolumeActuel() != null) {
+            reservoir.setVolumeActuel(dto.getVolumeActuel());
+        }
+        if (dto.getLocalisation() != null) {
+            reservoir.setLocalisation(dto.getLocalisation());
+        }
+
+        // Validation après mise à jour
+        if (reservoir.getVolumeActuel() != null && reservoir.getCapaciteTotale() != null) {
+            if (reservoir.getVolumeActuel() > reservoir.getCapaciteTotale()) {
+                throw new RuntimeException("Le volume actuel ne peut pas dépasser la capacité totale");
+            }
+        }
+
+        Reservoir updated = reservoirRepository.save(reservoir);
+
+        // Vérifier alerte
+        if (updated.getVolumeActuel() != null && updated.getCapaciteTotale() != null) {
+            if (updated.getVolumeActuel() < updated.getCapaciteTotale() * 0.2) {
+                log.warn("ALERTE: Le réservoir {} est en dessous de 20% de sa capacité", updated.getNom());
+            }
+        }
+
+        return convertToDto(updated);
+    }
+
     public List<ReservoirDto> getReservoirsEnAlerte() {
         log.info("Récupération des réservoirs en alerte");
         return reservoirRepository.findReservoirsEnAlerte().stream()

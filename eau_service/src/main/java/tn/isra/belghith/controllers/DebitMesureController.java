@@ -21,6 +21,13 @@ public class DebitMesureController {
     @Autowired
     private DebitMesureService debitMesureService;
 
+    @GetMapping
+    public ResponseEntity<List<DebitMesureDto>> getAllDebits() {
+        log.info("Récupération de toutes les mesures de débit");
+        List<DebitMesureDto> debits = debitMesureService.getAllDebitMesures();
+        return ResponseEntity.ok(debits);
+    }
+
     @PostMapping
     public ResponseEntity<DebitMesureDto> enregistrerDebitMesure(@RequestBody DebitMesureDto dto) {
         log.info("Enregistrement d'une mesure de débit via API");
@@ -79,5 +86,17 @@ public class DebitMesureController {
         log.info("Suppression de la mesure de débit ID: {}", id);
         debitMesureService.deleteDebitMesure(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/verifier-energie/{pompeId}")
+    public ResponseEntity<Boolean> verifierDisponibiliteElectrique(@PathVariable Long pompeId) {
+        log.info("Vérification de la disponibilité électrique pour la pompe ID: {}", pompeId);
+        try {
+            boolean disponible = debitMesureService.verifierDisponibiliteElectrique(pompeId);
+            return ResponseEntity.ok(disponible);
+        } catch (Exception e) {
+            log.error("Erreur lors de la vérification: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(false);
+        }
     }
 }

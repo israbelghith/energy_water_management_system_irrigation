@@ -33,6 +33,15 @@ public class ReservoirController {
         return ResponseEntity.ok(reservoir);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<ReservoirDto> updateReservoir(
+            @PathVariable Long id,
+            @RequestBody ReservoirDto dto) {
+        log.info("Mise à jour du réservoir ID: {}", id);
+        ReservoirDto updated = reservoirService.updateReservoir(id, dto);
+        return ResponseEntity.ok(updated);
+    }
+
     @GetMapping
     public ResponseEntity<List<ReservoirDto>> getAllReservoirs() {
         log.info("Récupération de tous les réservoirs");
