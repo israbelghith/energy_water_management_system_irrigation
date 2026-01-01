@@ -1,0 +1,155 @@
+<div class="consommation-container">
+  <h2>Gestion des Consommations Électriques</h2>
+
+  <div class="alert alert-error" *ngIf="error">
+    {{ error }}
+  </div>
+
+  <!-- Stats Card -->
+  <div class="stats-card">
+    <div class="stat-item">
+      <span class="stat-label">Consommation Totale:</span>
+      <span class="stat-value">{{ totalConsommation | number:'1.2-2' }} kWh</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Nombre de mesures:</span>
+      <span class="stat-value">{{ consommations.length }}</span>
+    </div>
+  </div>
+
+  <!-- Actions Bar -->
+  <div class="actions-bar">
+    <div class="left-actions">
+      <button class="btn btn-primary" (click)="openCreateForm()">
+        ➕ Ajouter une Consommation
+      </button>
+
+      <div class="filter-group">
+        <select [(ngModel)]="selectedPompeId" (change)="filterByPompe()" class="select-filter">
+          <option [value]="null">Toutes les pompes</option>
+          <option *ngFor="let pompe of pompes" [value]="pompe.id">
+            {{ pompe.reference }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <div class="right-actions">
+      <input
+        type="number"
+        [(ngModel)]="seuilSurconsommation"
+        placeholder="Seuil (kWh)"
+        class="threshold-input"
+      >
+      <button class="btn btn-warning" (click)="checkSurconsommations()">
+        ⚠️ Vérifier Surconsommations
+      </button>
+    </div>
+  </div>
+
+  <div class="loading" *ngIf="loading && !showForm">
+    Chargement...
+  </div>
+
+  <!-- Form Modal -->
+  <div class="modal" *ngIf="showForm">
+    <div class="modal-content">
+      <h3>Ajouter une Consommation</h3>
+      <form (ngSubmit)="saveConsommation()">
+        <div class="form-group">
+          <label for="pompeId">Pompe:</label>
+          <select
+            id="pompeId"
+            [(ngModel)]="consommationForm.pompeId"
+            name="pompeId"
+            required
+          >
+            <option *ngFor="let pompe of pompes" [value]="pompe.id">
+              {{ pompe.reference }} ({{ pompe.puissance }} kW)
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="energieUtilisee">Énergie Utilisée (kWh):</label>
+          <input
+            type="number"
+            id="energieUtilisee"
+            [(ngModel)]="consommationForm.energieUtilisee"
+            name="energieUtilisee"
+            required
+            min="0"
+            step="0.01"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="duree">Durée (heures):</label>
+          <input
+            type="number"
+            id="duree"
+            [(ngModel)]="consommationForm.duree"
+            name="duree"
+            required
+            min="0"
+            step="0.1"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="dateMesure">Date de Mesure:</label>
+          <input
+            type="datetime-local"
+            id="dateMesure"
+            [(ngModel)]="consommationForm.dateMesure"
+            name="dateMesure"
+            required
+          >
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" [disabled]="loading">
+            {{ loading ? 'Enregistrement...' : 'Enregistrer' }}
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="closeForm()">
+            Annuler
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Consommations Table -->
+  <div class="table-container" *ngIf="!loading || showForm">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Pompe</th>
+          <th>Énergie Utilisée (kWh)</th>
+          <th>Durée (h)</th>
+          <th>Date de Mesure</th>
+          <th>Puissance Moyenne (kW)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let consommation of consommations">
+          <td>{{ consommation.id }}</td>
+          <td>{{ getPompeName(consommation.pompeId) }}</td>
+          <td>
+            <span [class.high-consumption]="consommation.energieUtilisee > seuilSurconsommation">
+              {{ consommation.energieUtilisee | number:'1.2-2' }}
+            </span>
+          </td>
+          <td>{{ consommation.duree | number:'1.1-1' }}</td>
+          <td>{{ consommation.dateMesure | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td>{{ (consommation.energieUtilisee / consommation.duree) | number:'1.2-2' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="no-data" *ngIf="!loading && consommations.length === 0 && !showForm">
+    Aucune consommation enregistrée. Cliquez sur "Ajouter une Consommation" pour commencer.
+  </div>
+</div>

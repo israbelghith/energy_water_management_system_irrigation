@@ -1,0 +1,154 @@
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1>🌾 Système de Gestion d'Irrigation</h1>
+    <button class="btn btn-refresh" (click)="refreshDashboard()" [disabled]="loading">
+      🔄 {{ loading ? 'Actualisation...' : 'Actualiser' }}
+    </button>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card energy-card">
+      <div class="stat-icon">⚡</div>
+      <div class="stat-content">
+        <h3>Énergie</h3>
+        <div class="stat-value">{{ consommationTotale | number:'1.2-2' }} kWh</div>
+        <div class="stat-label">Consommation Totale</div>
+      </div>
+    </div>
+
+    <div class="stat-card pumps-card">
+      <div class="stat-icon">🔧</div>
+      <div class="stat-content">
+        <h3>Pompes</h3>
+        <div class="stat-value">{{ pompesActives }} / {{ totalPompes }}</div>
+        <div class="stat-label">Pompes Actives</div>
+      </div>
+    </div>
+
+    <div class="stat-card water-card">
+      <div class="stat-icon">💧</div>
+      <div class="stat-content">
+        <h3>Réservoirs</h3>
+        <div class="stat-value">{{ totalReservoirs }}</div>
+        <div class="stat-label">Total Réservoirs</div>
+      </div>
+    </div>
+
+    <div class="stat-card alerts-card">
+      <div class="stat-icon">⚠️</div>
+      <div class="stat-content">
+        <h3>Alertes</h3>
+        <div class="stat-value">{{ alerts.length }}</div>
+        <div class="stat-label">Alertes Actives</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alerts Section -->
+  <div class="section">
+    <h2>🚨 Alertes et Notifications</h2>
+    <div class="alerts-container" *ngIf="alerts.length > 0">
+      <div
+        class="alert-item"
+        *ngFor="let alert of alerts"
+        [ngClass]="getSeverityClass(alert.severity)">
+        <div class="alert-header">
+          <span class="alert-icon">{{ getTypeIcon(alert.type) }}</span>
+          <span class="alert-type">{{ alert.type }}</span>
+          <span class="alert-severity">{{ alert.severity }}</span>
+        </div>
+        <div class="alert-message">{{ alert.message }}</div>
+        <div class="alert-timestamp">{{ alert.timestamp | date:'dd/MM/yyyy HH:mm' }}</div>
+      </div>
+    </div>
+    <div class="no-alerts" *ngIf="alerts.length === 0 && !loading">
+      ✅ Aucune alerte active. Tous les systèmes fonctionnent normalement.
+    </div>
+  </div>
+
+  <!-- Pompes Overview -->
+  <div class="section">
+    <h2>⚙️ État des Pompes</h2>
+    <div class="items-grid">
+      <div
+        class="item-card"
+        *ngFor="let pompe of pompes"
+        [ngClass]="'status-' + pompe.statut.toLowerCase()">
+        <div class="item-header">
+          <h4>{{ pompe.reference }}</h4>
+          <span class="badge">{{ pompe.statut }}</span>
+        </div>
+        <div class="item-details">
+          <p><strong>Puissance:</strong> {{ pompe.puissance }} kW</p>
+          <p><strong>Mise en service:</strong> {{ pompe.dateMiseEnService | date:'dd/MM/yyyy' }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="no-data" *ngIf="pompes.length === 0 && !loading">
+      Aucune pompe enregistrée.
+    </div>
+  </div>
+
+  <!-- Reservoirs Overview -->
+  <div class="section">
+    <h2>💧 État des Réservoirs</h2>
+    <div class="items-grid">
+      <div
+        class="item-card reservoir-card"
+        *ngFor="let reservoir of reservoirs">
+        <div class="item-header">
+          <h4>{{ reservoir.nom }}</h4>
+          <span class="location">📍 {{ reservoir.localisation }}</span>
+        </div>
+        <div class="item-details">
+          <p><strong>Capacité:</strong> {{ reservoir.capaciteTotale }} m³</p>
+          <p><strong>Volume actuel:</strong> {{ reservoir.volumeActuel }} m³</p>
+
+          <div class="progress-bar">
+            <div
+              class="progress-fill"
+              [style.width.%]="getRemplissage(reservoir)"
+              [ngClass]="{
+                'critical': getRemplissage(reservoir) < 20,
+                'warning': getRemplissage(reservoir) >= 20 && getRemplissage(reservoir) < 50,
+                'good': getRemplissage(reservoir) >= 50
+              }">
+            </div>
+          </div>
+          <p class="percentage">{{ getRemplissage(reservoir) | number:'1.1-1' }}%</p>
+        </div>
+      </div>
+    </div>
+    <div class="no-data" *ngIf="reservoirs.length === 0 && !loading">
+      Aucun réservoir enregistré.
+    </div>
+  </div>
+
+  <!-- System Info -->
+  <div class="section system-info">
+    <h2>ℹ️ Informations Système</h2>
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="info-label">Architecture</div>
+        <div class="info-value">Microservices (Spring Boot + Angular)</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">Communication</div>
+        <div class="info-value">Synchrone (REST) + Asynchrone (RabbitMQ)</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">Services</div>
+        <div class="info-value">Energy Service, Eau Service, Gateway, Eureka, Config</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">Dernière mise à jour</div>
+        <div class="info-value">{{ currentDate | date:'dd/MM/yyyy HH:mm:ss' }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading-overlay" *ngIf="loading">
+    <div class="spinner"></div>
+  </div>
+</div>

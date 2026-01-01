@@ -1,0 +1,54 @@
+<div class="app-container">
+  <!-- Sidebar Navigation -->
+  <nav class="sidebar" [class.open]="menuOpen">
+    <div class="sidebar-header">
+      <h1>?? Irrigation</h1>
+      <button class="menu-toggle" (click)="toggleMenu()">
+        {{ menuOpen ? '\u2715' : '\u2630' }}
+      </button>
+    </div>
+    
+    <div class="nav-links">
+      <a routerLink="/dashboard" routerLinkActive="active" (click)="toggleMenu()">
+        <span class="icon">??</span>
+        <span class="label">Dashboard</span>
+      </a>
+      
+      <div class="nav-section">
+        <div class="section-title">? Microservice Énergie</div>
+        <a routerLink="/pompes" routerLinkActive="active" (click)="toggleMenu()">
+          <span class="icon">??</span>
+          <span class="label">Pompes</span>
+        </a>
+        <a routerLink="/consommations" routerLinkActive="active" (click)="toggleMenu()">
+          <span class="icon">?</span>
+          <span class="label">Consommations</span>
+        </a>
+      </div>
+      
+      <div class="nav-section">
+        <div class="section-title">?? Microservice Eau</div>
+        <a routerLink="/reservoirs" routerLinkActive="active" (click)="toggleMenu()">
+          <span class="icon">??</span>
+          <span class="label">Réservoirs</span>
+        </a>
+        <a routerLink="/debits" routerLinkActive="active" (click)="toggleMenu()">
+          <span class="icon">??</span>
+          <span class="label">Débits</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <p>v1.0.0 - Spring Boot + Angular</p>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <button class="mobile-menu-btn" (click)="toggleMenu()">
+      ? Menu
+    </button>
+    <router-outlet></router-outlet>
+  </main>
+</div>
