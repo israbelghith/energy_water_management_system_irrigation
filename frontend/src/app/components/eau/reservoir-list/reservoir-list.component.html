@@ -1,0 +1,145 @@
+<div class="reservoir-container">
+  <h2>Gestion des Réservoirs</h2>
+
+  <div class="alert alert-error" *ngIf="error">
+    {{ error }}
+  </div>
+
+  <div class="actions-bar">
+    <button class="btn btn-primary" (click)="openCreateForm()">
+      ➕ Ajouter un Réservoir
+    </button>
+
+    <div class="critical-check">
+      <input
+        type="number"
+        [(ngModel)]="seuilCritique"
+        placeholder="Seuil (%)"
+        class="threshold-input"
+        min="0"
+        max="100"
+      >
+      <button class="btn btn-warning" (click)="checkReservoirsCritiques()">
+        ⚠️ Vérifier Niveaux Critiques
+      </button>
+    </div>
+  </div>
+
+  <div class="loading" *ngIf="loading && !showForm">
+    Chargement...
+  </div>
+
+  <!-- Form Modal -->
+  <div class="modal" *ngIf="showForm">
+    <div class="modal-content">
+      <h3>{{ isEditing ? 'Modifier' : 'Créer' }} un Réservoir</h3>
+      <form (ngSubmit)="saveReservoir()">
+        <div class="form-group">
+          <label for="nom">Nom:</label>
+          <input
+            type="text"
+            id="nom"
+            [(ngModel)]="reservoirForm.nom"
+            name="nom"
+            required
+            placeholder="Ex: Réservoir Principal"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="capaciteTotale">Capacité Totale (m³):</label>
+          <input
+            type="number"
+            id="capaciteTotale"
+            [(ngModel)]="reservoirForm.capaciteTotale"
+            name="capaciteTotale"
+            required
+            min="0"
+            step="0.1"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="volumeActuel">Volume Actuel (m³):</label>
+          <input
+            type="number"
+            id="volumeActuel"
+            [(ngModel)]="reservoirForm.volumeActuel"
+            name="volumeActuel"
+            required
+            min="0"
+            step="0.1"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="localisation">Localisation:</label>
+          <input
+            type="text"
+            id="localisation"
+            [(ngModel)]="reservoirForm.localisation"
+            name="localisation"
+            required
+            placeholder="Ex: Zone Nord"
+          >
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" [disabled]="loading">
+            {{ loading ? 'Enregistrement...' : 'Enregistrer' }}
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="closeForm()">
+            Annuler
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Reservoirs Grid -->
+  <div class="reservoirs-grid" *ngIf="!loading || showForm">
+    <div class="reservoir-card" *ngFor="let reservoir of reservoirs">
+      <div class="card-header">
+        <h3>{{ reservoir.nom }}</h3>
+        <span class="location-badge">📍 {{ reservoir.localisation }}</span>
+      </div>
+
+      <div class="card-body">
+        <div class="capacity-info">
+          <p><strong>Capacité Totale:</strong> {{ reservoir.capaciteTotale }} m³</p>
+          <p><strong>Volume Actuel:</strong> {{ reservoir.volumeActuel }} m³</p>
+        </div>
+
+        <!-- Level Indicator -->
+        <div class="level-container">
+          <div class="level-label">
+            <span>Niveau de remplissage</span>
+            <span class="percentage" [ngClass]="getRemplissageClass(reservoir)">
+              {{ getRemplissage(reservoir) | number:'1.1-1' }}%
+            </span>
+          </div>
+          <div class="level-bar">
+            <div
+              class="level-fill"
+              [ngClass]="getRemplissageClass(reservoir)"
+              [style.width.%]="getRemplissage(reservoir)">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-actions">
+        <button class="btn btn-sm btn-info" (click)="openEditForm(reservoir)">
+          Modifier
+        </button>
+        <button class="btn btn-sm btn-danger" (click)="deleteReservoir(reservoir.id!)">
+          Supprimer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="no-data" *ngIf="!loading && reservoirs.length === 0 && !showForm">
+    Aucun réservoir disponible. Cliquez sur "Ajouter un Réservoir" pour commencer.
+  </div>
+</div>
