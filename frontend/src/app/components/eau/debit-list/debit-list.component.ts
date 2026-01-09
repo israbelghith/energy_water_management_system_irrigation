@@ -45,7 +45,7 @@ export class DebitListComponent implements OnInit {
         this.pompes = data;
       },
       error: (err) => {
-        console.error('Erreur lors du chargement des pompes', err);
+        // Log removed
       }
     });
   }
@@ -62,7 +62,7 @@ export class DebitListComponent implements OnInit {
         },
         error: (err) => {
           this.error = 'Erreur lors du chargement des débits';
-          console.error(err);
+        // Log removed
           this.loading = false;
         }
       });
@@ -74,7 +74,7 @@ export class DebitListComponent implements OnInit {
         },
         error: (err) => {
           this.error = 'Erreur lors du chargement des débits';
-          console.error(err);
+        // Log removed
           this.loading = false;
         }
       });
@@ -101,7 +101,7 @@ export class DebitListComponent implements OnInit {
       },
       error: (err) => {
         this.error = 'Erreur lors de l\'enregistrement du débit';
-        console.error(err);
+        // Log removed
         this.loading = false;
       }
     });
@@ -121,7 +121,7 @@ export class DebitListComponent implements OnInit {
       },
       error: (err) => {
         this.error = 'Erreur lors de la vérification de la disponibilité électrique';
-        console.error(err);
+        // Log removed
         this.checkingEnergy = false;
       }
     });
@@ -135,7 +135,7 @@ export class DebitListComponent implements OnInit {
       },
       error: (err) => {
         this.error = 'Erreur lors du calcul du débit moyen';
-        console.error(err);
+        // Log removed
       }
     });
   }

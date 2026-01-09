@@ -68,7 +68,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.checkAlerts();
       this.loading = false;
     }).catch(err => {
-      console.error('Erreur lors du chargement du dashboard', err);
+      // Log removed
       this.loading = false;
     });
   }
@@ -81,7 +81,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           resolve();
         },
         error: (err: any) => {
-          console.error('Erreur lors du chargement des pompes', err);
+      // Log removed
           reject(err);
         }
       });
@@ -96,7 +96,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           resolve();
         },
         error: (err: any) => {
-          console.error('Erreur lors du chargement des réservoirs', err);
+      // Log removed
           reject(err);
         }
       });
@@ -111,7 +111,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           resolve();
         },
         error: (err: any) => {
-          console.error('Erreur lors du chargement des consommations', err);
+      // Log removed
           reject(err);
         }
       });

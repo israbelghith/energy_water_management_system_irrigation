@@ -43,7 +43,7 @@ export class ReservoirListComponent implements OnInit {
       },
       error: (err) => {
         this.error = 'Erreur lors du chargement des réservoirs';
-        console.error(err);
+        // Log removed
         this.loading = false;
       }
     });
@@ -79,7 +79,7 @@ export class ReservoirListComponent implements OnInit {
         },
         error: (err) => {
           this.error = 'Erreur lors de la mise à jour du réservoir';
-          console.error(err);
+        // Log removed
           this.loading = false;
         }
       });
@@ -91,7 +91,7 @@ export class ReservoirListComponent implements OnInit {
         },
         error: (err) => {
           this.error = 'Erreur lors de la création du réservoir';
-          console.error(err);
+        // Log removed
           this.loading = false;
         }
       });
@@ -107,7 +107,7 @@ export class ReservoirListComponent implements OnInit {
         },
         error: (err) => {
           this.error = 'Erreur lors de la suppression du réservoir';
-          console.error(err);
+        // Log removed
           this.loading = false;
         }
       });
@@ -126,7 +126,7 @@ export class ReservoirListComponent implements OnInit {
       },
       error: (err) => {
         this.error = 'Erreur lors de la vérification des réservoirs critiques';
-        console.error(err);
+        // Log removed
       }
     });
   }

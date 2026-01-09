@@ -43,7 +43,7 @@ export class ConsommationListComponent implements OnInit {
         this.pompes = data;
       },
       error: (err) => {
-        console.error('Erreur lors du chargement des pompes', err);
+        // Log removed
       }
     });
   }
@@ -60,7 +60,7 @@ export class ConsommationListComponent implements OnInit {
         },
         error: (err) => {
           this.error = 'Erreur lors du chargement des consommations';
-          console.error(err);
+        // Log removed
           this.loading = false;
         }
       });
@@ -72,7 +72,7 @@ export class ConsommationListComponent implements OnInit {
         },
         error: (err) => {
           this.error = 'Erreur lors du chargement des consommations';
-          console.error(err);
+        // Log removed
           this.loading = false;
         }
       });
@@ -85,7 +85,7 @@ export class ConsommationListComponent implements OnInit {
         this.totalConsommation = total;
       },
       error: (err) => {
-        console.error('Erreur lors du chargement de la consommation totale', err);
+        // Log removed
       }
     });
   }
@@ -111,7 +111,7 @@ export class ConsommationListComponent implements OnInit {
       },
       error: (err) => {
         this.error = 'Erreur lors de l\'enregistrement de la consommation';
-        console.error(err);
+        // Log removed
         this.loading = false;
       }
     });
@@ -129,7 +129,7 @@ export class ConsommationListComponent implements OnInit {
       },
       error: (err) => {
         this.error = 'Erreur lors de la vérification des surconsommations';
-        console.error(err);
+        // Log removed
       }
     });
   }

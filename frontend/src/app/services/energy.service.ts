@@ -8,7 +8,7 @@ import { ConsommationElectrique, ConsommationElectriqueDTO } from '../models/con
   providedIn: 'root'
 })
 export class EnergyService {
-  private apiUrl = 'http://localhost:9095/energy';
+  private apiUrl = 'http://localhost:30888/energy';
 
   private httpOptions = {
     headers: new HttpHeaders({

@@ -8,7 +8,7 @@ import { DebitMesure, DebitMesureDto } from '../models/debit-mesure.model';
   providedIn: 'root'
 })
 export class EauService {
-  private apiUrl = 'http://localhost:9095/eau';
+  private apiUrl = 'http://localhost:30888/eau';
 
   private httpOptions = {
     headers: new HttpHeaders({
@@ -44,7 +44,7 @@ export class EauService {
   }
 
   getReservoirsCritiques(seuil: number): Observable<Reservoir[]> {
-    return this.http.get<Reservoir[]>(`${this.apiUrl}/api/reservoirs/critiques/${seuil}`);
+    return this.http.get<Reservoir[]>(`${this.apiUrl}/api/reservoirs/alertes`);
   }
 
   // Debit Mesure endpoints

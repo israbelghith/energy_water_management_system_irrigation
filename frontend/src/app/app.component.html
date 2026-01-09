@@ -2,7 +2,7 @@
   <!-- Sidebar Navigation -->
   <nav class="sidebar" [class.open]="menuOpen">
     <div class="sidebar-header">
-      <h1>?? Irrigation</h1>
+      <h1>🌾 Irrigation</h1>
       <button class="menu-toggle" (click)="toggleMenu()">
         {{ menuOpen ? '\u2715' : '\u2630' }}
       </button>
@@ -10,31 +10,31 @@
     
     <div class="nav-links">
       <a routerLink="/dashboard" routerLinkActive="active" (click)="toggleMenu()">
-        <span class="icon">??</span>
+        <span class="icon">📊</span>
         <span class="label">Dashboard</span>
       </a>
       
       <div class="nav-section">
-        <div class="section-title">? Microservice �nergie</div>
+        <div class="section-title">Microservice Energie</div>
         <a routerLink="/pompes" routerLinkActive="active" (click)="toggleMenu()">
-          <span class="icon">??</span>
+          <span class="icon">⚙️</span>
           <span class="label">Pompes</span>
         </a>
         <a routerLink="/consommations" routerLinkActive="active" (click)="toggleMenu()">
-          <span class="icon">?</span>
+          <span class="icon">⚡</span>
           <span class="label">Consommations</span>
         </a>
       </div>
       
       <div class="nav-section">
-        <div class="section-title">?? Microservice Eau</div>
+        <div class="section-title">Microservice Eau</div>
         <a routerLink="/reservoirs" routerLinkActive="active" (click)="toggleMenu()">
-          <span class="icon">??</span>
-          <span class="label">R�servoirs</span>
+          <span class="icon">💧</span>
+          <span class="label">Reservoirs</span>
         </a>
         <a routerLink="/debits" routerLinkActive="active" (click)="toggleMenu()">
-          <span class="icon">??</span>
-          <span class="label">D�bits</span>
+          <span class="icon">💦</span>
+          <span class="label">Debits</span>
         </a>
       </div>
     </div>
@@ -47,7 +47,7 @@
   <!-- Main Content -->
   <main class="main-content">
     <button class="mobile-menu-btn" (click)="toggleMenu()">
-      ? Menu
+      ☰ Menu
     </button>
     <router-outlet></router-outlet>
   </main>

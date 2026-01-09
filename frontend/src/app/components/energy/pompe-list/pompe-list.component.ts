@@ -44,7 +44,7 @@ export class PompeListComponent implements OnInit {
       },
       error: (err) => {
         this.error = 'Erreur lors du chargement des pompes';
-        console.error(err);
+        // Log removed
         this.loading = false;
       }
     });
@@ -82,7 +82,7 @@ export class PompeListComponent implements OnInit {
         },
         error: (err) => {
           this.error = 'Erreur lors de la mise à jour de la pompe';
-          console.error(err);
+        // Log removed
           this.loading = false;
         }
       });
@@ -94,7 +94,7 @@ export class PompeListComponent implements OnInit {
         },
         error: (err) => {
           this.error = 'Erreur lors de la création de la pompe';
-          console.error(err);
+        // Log removed
           this.loading = false;
         }
       });
@@ -110,7 +110,7 @@ export class PompeListComponent implements OnInit {
         },
         error: (err) => {
           this.error = 'Erreur lors de la suppression de la pompe';
-          console.error(err);
+        // Log removed
           this.loading = false;
         }
       });
@@ -124,7 +124,7 @@ export class PompeListComponent implements OnInit {
       },
       error: (err) => {
         this.error = 'Erreur lors de l\'activation de la pompe';
-        console.error(err);
+        // Log removed
       }
     });
   }
@@ -136,7 +136,7 @@ export class PompeListComponent implements OnInit {
       },
       error: (err) => {
         this.error = 'Erreur lors de la désactivation de la pompe';
-        console.error(err);
+        // Log removed
       }
     });
   }
