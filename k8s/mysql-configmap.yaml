@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-initdb
+  namespace: irrigation-system
+data:
+  init-db.sql: |
+    CREATE DATABASE IF NOT EXISTS energyDB;
+    CREATE DATABASE IF NOT EXISTS eauDB;
+    GRANT ALL PRIVILEGES ON energyDB.* TO 'root'@'%';
+    GRANT ALL PRIVILEGES ON eauDB.* TO 'root'@'%';
+    FLUSH PRIVILEGES;

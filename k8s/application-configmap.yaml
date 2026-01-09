@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: microservices-config
+  namespace: irrigation-system
+data:
+  # Common configuration for all microservices
+  EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://mseureka:8080/eureka"
+  SPRING_CLOUD_CONFIG_URI: "http://configserver:9999"
+  
+  # Database configuration for energy service
+  ENERGY_DB_URL: "jdbc:mysql://mysql:3306/energyDB?serverTimezone=UTC&createDatabaseIfNotExist=true"
+  
+  # Database configuration for eau service
+  EAU_DB_URL: "jdbc:mysql://mysql:3306/eauDB?serverTimezone=UTC&createDatabaseIfNotExist=true"
+  
+  # Database credentials
+  DB_USERNAME: "root"
+  DB_PASSWORD: "root"

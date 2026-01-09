@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eau-service
+  namespace: irrigation-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eau-service
+  template:
+    metadata:
+      labels:
+        app: eau-service
+    spec:
+      initContainers:
+      - name: wait-for-mysql
+        image: busybox:1.28
+        command: ['sh', '-c', 'until nc -z mysql 3306; do echo waiting for mysql; sleep 2; done;']
+      - name: wait-for-eureka
+        image: busybox:1.28
+        command: ['sh', '-c', 'until nc -z mseureka 8080; do echo waiting for eureka; sleep 2; done;']
+      containers:
+      - name: eau-service
+        image: dsspring-eau_service:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 9093
+          name: http
+        env:
+        - name: SPRING_CLOUD_CONFIG_URI
+          valueFrom:
+            configMapKeyRef:
+              name: microservices-config
+              key: SPRING_CLOUD_CONFIG_URI
+        - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+          valueFrom:
+            configMapKeyRef:
+              name: microservices-config
+              key: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+        - name: SPRING_DATASOURCE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: microservices-config
+              key: EAU_DB_URL
+        - name: SPRING_DATASOURCE_USERNAME
+          valueFrom:
+            configMapKeyRef:
+              name: microservices-config
+              key: DB_USERNAME
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              name: microservices-config
+              key: DB_PASSWORD
+        livenessProbe:
+          tcpSocket:
+            port: 9093
+          initialDelaySeconds: 60
+          periodSeconds: 10
+        readinessProbe:
+          tcpSocket:
+            port: 9093
+          initialDelaySeconds: 30
+          periodSeconds: 5

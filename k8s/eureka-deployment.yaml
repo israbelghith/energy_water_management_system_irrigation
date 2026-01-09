@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mseureka
+  namespace: irrigation-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mseureka
+  template:
+    metadata:
+      labels:
+        app: mseureka
+    spec:
+      containers:
+      - name: mseureka
+        image: dsspring-mseureka:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: "default"
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 5

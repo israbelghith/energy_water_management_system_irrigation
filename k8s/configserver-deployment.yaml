@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: configserver
+  namespace: irrigation-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: configserver
+  template:
+    metadata:
+      labels:
+        app: configserver
+    spec:
+      initContainers:
+      - name: wait-for-eureka
+        image: busybox:1.28
+        command: ['sh', '-c', 'until nc -z mseureka 8080; do echo waiting for eureka; sleep 2; done;']
+      containers:
+      - name: configserver
+        image: dsspring-configserver:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 9999
+          name: http
+        env:
+        - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+          valueFrom:
+            configMapKeyRef:
+              name: microservices-config
+              key: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+        livenessProbe:
+          tcpSocket:
+            port: 9999
+          initialDelaySeconds: 60
+          periodSeconds: 10
+        readinessProbe:
+          tcpSocket:
+            port: 9999
+          initialDelaySeconds: 30
+          periodSeconds: 5

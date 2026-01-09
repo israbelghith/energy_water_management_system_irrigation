@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway
+  namespace: irrigation-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gateway
+  template:
+    metadata:
+      labels:
+        app: gateway
+    spec:
+      initContainers:
+      - name: wait-for-eureka
+        image: busybox:1.28
+        command: ['sh', '-c', 'until nc -z mseureka 8080; do echo waiting for eureka; sleep 2; done;']
+      - name: wait-for-configserver
+        image: busybox:1.28
+        command: ['sh', '-c', 'until nc -z configserver 9999; do echo waiting for configserver; sleep 2; done;']
+      containers:
+      - name: gateway
+        image: dsspring-gateway:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 9095
+          name: http
+        env:
+        - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+          valueFrom:
+            configMapKeyRef:
+              name: microservices-config
+              key: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+        - name: SPRING_CLOUD_CONFIG_URI
+          valueFrom:
+            configMapKeyRef:
+              name: microservices-config
+              key: SPRING_CLOUD_CONFIG_URI
+        livenessProbe:
+          tcpSocket:
+            port: 9095
+          initialDelaySeconds: 60
+          periodSeconds: 10
+        readinessProbe:
+          tcpSocket:
+            port: 9095
+          initialDelaySeconds: 30
+          periodSeconds: 5
