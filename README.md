@@ -86,13 +86,19 @@ energy_water_management_system_irrigation/
 │   │   ├── clients/      # Feign Clients
 │   │   └── events/
 │   └── Dockerfile
-├── frontend/              # Application Angular (branche develop-frontend)
+├── frontend/              # Application Angular 19
 │   ├── src/app/
 │   │   ├── components/   # UI Components
 │   │   ├── services/     # HTTP Services
 │   │   └── models/       # TypeScript Models
 │   └── Dockerfile
-├── kubernetes/            # Templates Kubernetes (à créer)
+├── k8s/                   # Configurations Kubernetes
+│   ├── namespace.yaml
+│   ├── mysql-*.yaml
+│   ├── *-deployment.yaml
+│   └── *-service.yaml
+├── docker-compose.yml     # Orchestration Docker
+├── init-db.sql           # Script d'initialisation DB
 └── README.md             # Ce fichier
 ```
 
@@ -144,9 +150,8 @@ cd gateway
 mvn spring-boot:run
 ```
 
-5. **Démarrer Frontend** (basculer sur branche develop-frontend)
+5. **Démarrer Frontend**
 ```bash
-git checkout develop-frontend
 cd frontend
 npm install
 npm start
@@ -159,33 +164,54 @@ npm start
 - Energy Service: http://localhost:9092
 - Eau Service: http://localhost:9093
 
-### Démarrage avec Docker
+### Démarrage avec Docker Compose
 
 ```bash
-# Build des images
-docker build -t config-server ./ConfigServer
-docker build -t eureka-server ./MSEureka
-docker build -t energy-service ./energy_service
-docker build -t eau-service ./eau_service
-docker build -t gateway ./gateway
-
-# Frontend (sur branche develop-frontend)
-git checkout develop-frontend
-docker build -t frontend ./frontend
-
-# Démarrage avec docker-compose
+# Démarrer tous les services
 docker-compose up -d
+
+# Vérifier l'état des conteneurs
+docker-compose ps
+
+# Voir les logs
+docker-compose logs -f
+
+# Arrêter les services
+docker-compose down
 ```
 
 ### Déploiement Kubernetes
 
 ```bash
-# Appliquer les configurations
-kubectl apply -f kubernetes/
+# Créer le namespace
+kubectl apply -f k8s/namespace.yaml
+
+# Déployer MySQL et ConfigMap
+kubectl apply -f k8s/mysql-pvc.yaml
+kubectl apply -f k8s/mysql-configmap.yaml
+kubectl apply -f k8s/mysql-deployment.yaml
+kubectl apply -f k8s/mysql-service.yaml
+kubectl apply -f k8s/application-configmap.yaml
+
+# Déployer les microservices
+kubectl apply -f k8s/eureka-deployment.yaml
+kubectl apply -f k8s/eureka-service.yaml
+kubectl apply -f k8s/configserver-deployment.yaml
+kubectl apply -f k8s/configserver-service.yaml
+kubectl apply -f k8s/gateway-deployment.yaml
+kubectl apply -f k8s/gateway-service.yaml
+kubectl apply -f k8s/energy-service-deployment.yaml
+kubectl apply -f k8s/energy-service-service.yaml
+kubectl apply -f k8s/eau-service-deployment.yaml
+kubectl apply -f k8s/eau-service-service.yaml
+
+# Déployer le frontend
+kubectl apply -f k8s/frontend-deployment.yaml
+kubectl apply -f k8s/frontend-service.yaml
 
 # Vérifier le déploiement
-kubectl get pods
-kubectl get services
+kubectl get pods -n irrigation-system
+kubectl get services -n irrigation-system
 ```
 
 ## 🔌 API Endpoints
@@ -280,8 +306,7 @@ mvn test
 cd eau_service
 mvn test
 
-# Frontend (branche develop-frontend)
-git checkout develop-frontend
+# Frontend
 cd frontend
 npm test
 ```
@@ -303,9 +328,9 @@ npm test
 ## 📝 Conventions Git
 
 ### Branches
-- `main`: Production
-- `develop-backend`: Développement backend (microservices Spring Boot)
-- `develop-frontend`: Développement frontend (Angular 19)
+- `main`: Production (Backend + Frontend + Déploiement)
+- `develop-backend`: Développement backend (fusionnée dans main)
+- `develop-frontend`: Développement frontend (fusionnée dans main)
 
 ### Commits
 Format: `type(scope): description`
@@ -323,6 +348,3 @@ Projet académique - Gestion d'Irrigation Intelligente
 
 Ce projet est développé dans un cadre académique.
 
----
-
-**Note**: Le frontend est disponible sur la branche `develop-frontend`. Pour y accéder: `git checkout develop-frontend`
